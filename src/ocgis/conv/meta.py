@@ -64,3 +64,10 @@ class MetaConverter(object):
         
     def write(self):
         return('\n'.join(self.get_rows()))
+    
+    
+class XMLMetaConverter(MetaConverter):
+    _meta_filename = 'meta.xml'
+
+    def get_rows(self):
+        import ipdb;ipdb.set_trace()
