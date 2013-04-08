@@ -2,6 +2,8 @@ import datetime
 import ocgis
 from ocgis.api.parms.base import OcgParameter
 from ocgis.util.justify import justify_row
+import xml.etree.ElementTree as ET
+from ocgis.api.parms.definition import Dataset, DirOutput, Prefix
 
 
 HEADERS = {
@@ -70,4 +72,21 @@ class XMLMetaConverter(MetaConverter):
     _meta_filename = 'meta.xml'
 
     def get_rows(self):
-        import ipdb;ipdb.set_trace()
+        meta_ = ET.Element('metadata')
+        ocg = ET.SubElement(meta_,'OpenClimateGIS')
+        parms = ET.SubElement(ocg,'parameters')
+        for k,v in sorted(self.ops.__dict__.iteritems()):
+            if isinstance(v,OcgParameter):
+                parm = ET.SubElement(parms,'parameter')
+                name = ET.SubElement(parm,'name')
+                name.text = v.name
+                v.set_xml(parm)
+#        from xml.dom import minidom
+#        rough_string = ET.tostring(meta_,'utf-8')
+##        import ipdb;ipdb.set_trace()
+##        rough_string = ET.dump(meta_)
+#        try:
+#            reparsed = minidom.parseString(rough_string)
+#        except:
+#            import ipdb;ipdb.set_trace()
+        return(meta_)

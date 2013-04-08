@@ -3,6 +3,7 @@ from ocgis.exc import DefinitionValidationError
 from copy import deepcopy
 from ocgis.util.justify import justify_row
 from types import NoneType
+import xml.etree.ElementTree as ET
 
 
 class OcgParameter(object):
@@ -54,14 +55,17 @@ class OcgParameter(object):
         self._value = ret
     value = property(_get_value_,_set_value_)
         
-    def get_meta(self):
+    def get_meta(self,raw=False):
         subrows = self._get_meta_()
-        if isinstance(subrows,basestring):
-            subrows = [subrows]
-        rows = [self.__repr__()]
-        for row in subrows:
-            rows.extend(justify_row(row))
-            rows.append('')
+        if raw:
+            return(subrows)
+        else:
+            if isinstance(subrows,basestring):
+                subrows = [subrows]
+            rows = [self.__repr__()]
+            for row in subrows:
+                rows.extend(justify_row(row))
+                rows.append('')
         return(rows)
     
     def get_url_string(self):
@@ -82,6 +86,12 @@ class OcgParameter(object):
         else:
             ret = self._parse_string_(modified)
         return(ret)
+    
+    def set_xml(self,parent):
+        pval = ET.SubElement(parent,'value')
+        pval.text = self.get_url_string()
+        desc = ET.SubElement(parent,'description')
+        desc.text = self.get_meta(raw=True)
     
     def validate(self,value):
         if value is None:

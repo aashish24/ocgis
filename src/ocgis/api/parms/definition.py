@@ -9,6 +9,7 @@ from ocgis.calc import library
 from collections import OrderedDict
 import ocgis
 from os.path import exists
+import xml.etree.ElementTree as ET
 
 
 class Abstraction(base.StringOptionParameter):
@@ -227,6 +228,18 @@ class Dataset(base.OcgParameter):
                 out_str.append(app)
         out_str = '&'.join(out_str)
         return(out_str)
+    
+    def set_xml(self,parent):
+        ds = ET.SubElement(parent,'dataset')
+        for rd in self.value:
+            reqd = ET.SubElement(ds,'request_dataset')
+            rows = rd._get_meta_rows_()
+            for row in rows:
+                row = row.strip()
+                if not row.startswith('Overloaded Parameters'):
+                    name,value = row.split(': ')
+                    element = ET.SubElement(reqd,name.lower().replace(' ','_'))
+                    element.text = value
     
     def _parse_string_(self,lowered):
         raise(NotImplementedError)
