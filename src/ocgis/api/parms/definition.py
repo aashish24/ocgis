@@ -97,6 +97,23 @@ class Calc(base.IterableParameter,base.OcgParameter):
         values.append(self._parse_({'func':'n','name':'n'}))
         return(values)
     
+    def set_xml(self,parent):
+        value = ET.SubElement(parent,'value')
+        if self.value is None:
+            value.text = 'None'
+        else:
+            for calc in self.value:
+                name = ET.SubElement(value,'calculation_name')
+                name.text = calc['name']
+                desc = ET.SubElement(value,'calculation_description')
+                desc.text = calc['ref'].description
+                for k,v in calc['kwds'].iteritems():
+                    parameter = ET.SubElement(name,'calculation_parameter')
+                    cpn = ET.SubElement(parameter,'calculation_parameter_name')
+                    cpn.text = k
+                    cpv = ET.SubElement(parameter,'calculation_parameter_value')
+                    cpv.text = str(v)
+    
     def _get_meta_(self):
         if self.value is None:
             ret = 'No computations applied.'
